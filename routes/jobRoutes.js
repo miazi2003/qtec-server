@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllJobs);
-router.get("/:id", getSingleJob);
+router.get("/:job_id", getSingleJob);
 router.post("/", createJob);      
 router.delete("/:id", deleteJob); 
 

@@ -9,9 +9,10 @@ export const getAllJobs = async (req, res) => {
   }
 };
 
+// Get single job by job_id
 export const getSingleJob = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findOne({ job_id: req.params.job_id });
 
     if (!job) return res.status(404).json({ message: "Job not found" });
 
@@ -23,10 +24,21 @@ export const getSingleJob = async (req, res) => {
 
 export const createJob = async (req, res) => {
   try {
-    const newJob = new Job(req.body);
+    // Generate job_id automatically
+    const lastJob = await Job.findOne().sort({ createdAt: -1 });
+    let newId = "JOB-001";
+
+    if (lastJob && lastJob.job_id) {
+      const lastNumber = parseInt(lastJob.job_id.split("-")[1]);
+      const nextNumber = lastNumber + 1;
+      newId = `JOB-${nextNumber.toString().padStart(3, "0")}`;
+    }
+
+    const newJob = new Job({ ...req.body, job_id: newId });
     const savedJob = await newJob.save();
     res.status(201).json(savedJob);
   } catch (error) {
+    console.error(error);
     res.status(400).json({ message: error.message });
   }
 };
